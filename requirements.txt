@@ -1,12 +1,11 @@
 langchain
 langchain-community
 langchain-groq
-langgraph
-crewai
+langchain-core
+groq
 streamlit
 requests
 pandas
 numpy
 python-dotenv
-biopython
 duckduckgo-search
