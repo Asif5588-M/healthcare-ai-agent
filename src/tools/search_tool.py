@@ -1,36 +1,30 @@
-# src/tools/search_tool.py
 from langchain.tools import tool
-from ddgs import DDGS   # ← Changed here
 
 @tool
-def web_search(query: str, max_results: int = 5) -> str:
+def web_search(query: str) -> str:
     """
-    Search the web for latest medical news, statistics, and general health information.
+    Search the web for latest medical news and health information.
+    Use this tool when you need recent news, statistics,
+    or information not in research papers.
+    Input: search query
+    Output: relevant web results
     """
     try:
+        from duckduckgo_search import DDGS
         with DDGS() as ddgs:
-            results = list(ddgs.text(
-                keywords=query, 
-                max_results=max_results,
-                region="wt-wt",      # world-wide
-                safesearch="moderate"
-            ))
-        
+            results = list(ddgs.text(query, max_results=4))
+
         if not results:
-            return f"No web results found for: {query}. Try a simpler query."
+            return f"No web results found for: {query}"
 
         output = []
         for i, r in enumerate(results, 1):
-            title = r.get('title', 'N/A')
-            body = (r.get('body') or r.get('snippet', ''))[:280]
-            href = r.get('href', 'N/A')
             output.append(
-                f"**{i}. {title}**\n"
-                f"{body}...\n"
-                f"URL: {href}\n"
+                f"[{i}] {r.get('title', 'N/A')}\n"
+                f"    {r.get('body', '')[:300]}...\n"
+                f"    URL: {r.get('href', 'N/A')}\n"
             )
-        
-        return "\n---\n".join(output)
-        
+        return "\n".join(output)
+
     except Exception as e:
-        return f"Web search error: {str(e)}"
+        return f"Web search unavailable: {str(e)}. Using PubMed only."
